@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React, {ChangeEvent, useEffect, useState} from "react"
 import {get} from "@rails/request.js"
 import levenshtein from 'js-levenshtein';
 
@@ -9,7 +9,7 @@ export function Contacts() {
     const [filteredContacts, setFilteredContacts] = useState([])
 
     const [error, setError] = useState("")
-    const updateFilter = (e) => {
+    const updateFilter = (e: ChangeEvent<HTMLInputElement>) => {
         setFilter(e.target.value)
     }
 
@@ -51,8 +51,7 @@ export function Contacts() {
                     console.log(error.message)
                     setError("Unable to retrieve contacts, please try again.")
                 })
-        }, []
-    )
+        }, [])
 
     return <div className={"contacts-list"}>
         <input
