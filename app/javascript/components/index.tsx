@@ -8,3 +8,4 @@ document.addEventListener("turbo:load", () => {
     );
     root.render(<App/>);
 });
+export {Contacts} from "./contacts";
