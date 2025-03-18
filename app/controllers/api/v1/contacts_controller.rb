@@ -9,7 +9,7 @@ class Api::V1::ContactsController < ApplicationController
       contact = Contact.create!(contact_params)
       render json: contact
     rescue ActiveRecord::RecordInvalid => invalid
-      render json: invalid.record.errors
+      render json: invalid.record.errors, status: 400
     end
   end
 

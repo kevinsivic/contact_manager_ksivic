@@ -9,3 +9,4 @@ document.addEventListener("turbo:load", () => {
     root.render(<App/>);
 });
 export {Contacts} from "./contacts";
+export {CreateContact} from "./createContact";

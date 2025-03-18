@@ -1,5 +1,5 @@
 import React from "react";
-import {Link} from "react-router-dom";
+import {Navigation} from "./Navigation";
 
 export default () => (
     <div className="vw-100 vh-100 primary-color d-flex align-items-center justify-content-center">
@@ -9,14 +9,7 @@ export default () => (
                 <p className="lead">
                     A list of contacts to maintain your connections!
                 </p>
-                <hr className="my-4"/>
-                <Link
-                    to="/contacts"
-                    className="btn btn-lg custom-button"
-                    role="button"
-                >
-                    View Contacts
-                </Link>
+                <Navigation/>
             </div>
         </div>
     </div>
