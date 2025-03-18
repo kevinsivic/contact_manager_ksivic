@@ -1,14 +1,15 @@
 import React from "react"
 import {useEffect, useState} from "react";
+import {get} from "@rails/request.js"
 
 export function Contacts() {
     const [contacts, setContacts] = useState([])
     const [error, setError] = useState("")
     useEffect(() => {
-            fetch("/api/v1/contacts")
+            get("/api/v1/contacts")
                 .then(async (response) => {
                     if (response.ok) {
-                        setContacts(await response.json())
+                        setContacts(await response.json)
                     } else {
                         setError("Unable to retrieve contacts, please try again.")
                     }
