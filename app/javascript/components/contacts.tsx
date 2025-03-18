@@ -1,6 +1,7 @@
 import React, {ChangeEvent, useEffect, useState} from "react"
 import {get} from "@rails/request.js"
 import levenshtein from 'js-levenshtein';
+import {Navigation} from "./Navigation";
 
 export function Contacts() {
     const MIN_DISTANCE = 3;
@@ -79,5 +80,6 @@ export function Contacts() {
             })}
             </tbody>
         </table>
+        <Navigation />
     </div>;
 }
