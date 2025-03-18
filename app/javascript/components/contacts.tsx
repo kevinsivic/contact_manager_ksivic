@@ -1,5 +1,4 @@
-import React from "react"
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react"
 import {get} from "@rails/request.js"
 import levenshtein from 'js-levenshtein';
 
@@ -12,22 +11,31 @@ export function Contacts() {
     const [error, setError] = useState("")
     const updateFilter = (e) => {
         setFilter(e.target.value)
-
     }
+
+    function filterMatches(string: string) {
+        const lowerCase = string.toLowerCase();
+        if (filter == lowerCase.substring(0, filter.toLowerCase().length))
+            return true
+
+        const distance = levenshtein(lowerCase, filter.toLowerCase())
+        return distance < MIN_DISTANCE;
+    }
+
     useEffect(() => {
-        let foo = contacts;
-        if (filter) {
-            foo = contacts.filter((contact) => {
-                const names = contact.name.split(" ");
-                const filteredNames = names.filter((name: string) => {
-                    const distance = levenshtein(name, filter)
-                    return distance < MIN_DISTANCE
+        if (!filter) {
+            setFilteredContacts(contacts)
+        } else {
+            setFilteredContacts(contacts.filter((contact: { name: string; email: string; }) => {
+                    const names = contact.name.split(" ");
+                    const filteredNames = names.filter((name: string) => {
+                        return filterMatches(name)
+                    })
+                    console.log(filteredNames.length > 0)
+                    return filteredNames.length > 0 || filterMatches(contact.email)
                 })
-                console.log(filteredNames.length > 0)
-                return filteredNames.length > 0
-            })
+            )
         }
-        setFilteredContacts(foo)
     }, [contacts, filter])
 
     useEffect(() => {
