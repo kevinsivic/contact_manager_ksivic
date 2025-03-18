@@ -1,5 +1,5 @@
 import React, {ChangeEvent, useEffect, useState} from "react"
-import {get} from "@rails/request.js"
+import {get, destroy} from "@rails/request.js"
 import levenshtein from 'js-levenshtein';
 import {Navigation} from "./Navigation";
 
@@ -10,6 +10,7 @@ export function Contacts() {
     const [filteredContacts, setFilteredContacts] = useState([])
 
     const [error, setError] = useState("")
+    const [message, setMessage] = useState("")
     const updateFilter = (e: ChangeEvent<HTMLInputElement>) => {
         setFilter(e.target.value)
     }
@@ -21,6 +22,38 @@ export function Contacts() {
 
         const distance = levenshtein(lowerCase, filter.toLowerCase())
         return distance < MIN_DISTANCE;
+    }
+
+    function updateContacts() {
+        get("/api/v1/contacts")
+            .then(async (response) => {
+                if (response.ok) {
+                    setContacts(await response.json)
+                } else {
+                    setError("Unable to retrieve contacts, please try again.")
+                }
+            })
+            .catch((error) => {
+                console.log(error.message)
+                setError("Unable to retrieve contacts, please try again.")
+            })
+    }
+
+    function removeContact(key: React.Key) {
+        destroy("/api/v1/contacts/" + key)
+            .then(async (response) => {
+                if (response.ok) {
+                    setMessage("Successfully deleted contact")
+                } else {
+                    setError("Unable to delete contact.")
+                }
+            })
+            .catch((error) => {
+                console.log(error.message)
+                setError("Unable to delete contact.")
+            })
+
+        updateContacts()
     }
 
     useEffect(() => {
@@ -40,21 +73,12 @@ export function Contacts() {
     }, [contacts, filter])
 
     useEffect(() => {
-            get("/api/v1/contacts")
-                .then(async (response) => {
-                    if (response.ok) {
-                        setContacts(await response.json)
-                    } else {
-                        setError("Unable to retrieve contacts, please try again.")
-                    }
-                })
-                .catch((error) => {
-                    console.log(error.message)
-                    setError("Unable to retrieve contacts, please try again.")
-                })
-        }, [])
+        updateContacts();
+    }, [])
 
     return <div className={"contacts-list"}>
+        <div className={"message"}>{message}</div>
+        <div className={"error"}>{error}</div>
         <input
             type="text"
             value={filter}
@@ -65,21 +89,23 @@ export function Contacts() {
             <tr>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Edit</th>
+                <th>Delete</th>
             </tr>
             </thead>
             <tbody>
-            {filteredContacts.map((contact: { name: string, email: string }, key: React.Key) => {
+            {filteredContacts.map((contact: { name: string, email: string, id: number }, key: React.Key) => {
                 return (
                     <tr key={key}>
                         <td>{contact.name}</td>
                         <td>{contact.email}</td>
-                        <td></td>
+                        <td>
+                            <a onClick={() => removeContact(contact.id)}>Remove Contact</a>
+                        </td>
                     </tr>
                 )
             })}
             </tbody>
         </table>
-        <Navigation />
+        <Navigation/>
     </div>;
 }
