@@ -8,6 +8,7 @@ export function Contacts() {
     const [contacts, setContacts] = useState([])
     const [filter, setFilter] = useState("")
     const [filteredContacts, setFilteredContacts] = useState([])
+    const [contactToRemove, setContactToRemove] = useState<number | null>(null)
 
     const [error, setError] = useState("")
     const [message, setMessage] = useState("")
@@ -39,8 +40,8 @@ export function Contacts() {
             })
     }
 
-    function removeContact(key: React.Key) {
-        destroy("/api/v1/contacts/" + key)
+    function removeContact(id: number) {
+        destroy("/api/v1/contacts/" + id)
             .then(async (response) => {
                 if (response.ok) {
                     setMessage("Successfully deleted contact")
@@ -52,9 +53,14 @@ export function Contacts() {
                 console.log(error.message)
                 setError("Unable to delete contact.")
             })
-
-        updateContacts()
     }
+
+    useEffect(() => {
+        if (contactToRemove)
+            removeContact(contactToRemove)
+        setContactToRemove(null)
+        updateContacts()
+    }, [contactToRemove])
 
     useEffect(() => {
         if (!filter) {
@@ -65,7 +71,6 @@ export function Contacts() {
                     const filteredNames = names.filter((name: string) => {
                         return filterMatches(name)
                     })
-                    console.log(filteredNames.length > 0)
                     return filteredNames.length > 0 || filterMatches(contact.email)
                 })
             )
@@ -75,6 +80,10 @@ export function Contacts() {
     useEffect(() => {
         updateContacts();
     }, [])
+
+    function markContactForRemoval(id: number) {
+        setContactToRemove(id)
+    }
 
     return <div className={"contacts-list"}>
         <div className={"message"}>{message}</div>
@@ -99,7 +108,7 @@ export function Contacts() {
                         <td>{contact.name}</td>
                         <td>{contact.email}</td>
                         <td>
-                            <a onClick={() => removeContact(contact.id)}>Remove Contact</a>
+                            <a onClick={() => markContactForRemoval(contact.id)}>Remove Contact</a>
                         </td>
                     </tr>
                 )
